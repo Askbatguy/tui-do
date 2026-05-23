@@ -1,0 +1,11 @@
+#sidebar {
+    width: 25%;
+    background: $panel;
+    border-right: solid $primary;
+    padding: 1;
+}
+
+#main {
+    width: 75%;
+    padding: 1;
+}
