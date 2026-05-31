@@ -1,2 +1,5 @@
 .venv/
 Learnings/
+data/
+__pycache__/
+*.pyc
