@@ -2,7 +2,7 @@ import dataclasses
 import json
 from datetime import date
 from pathlib import Path
-from  tui_do.models import Category, Todo, Priority
+from  .models import Category, Todo, Priority
 
 DATA_FILE = Path("data/todos.json")
 
