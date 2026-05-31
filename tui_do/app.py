@@ -20,6 +20,7 @@ class TuiDoApp(App):
         ("q", "quit", "Quit"),
         ("a", "add_todo", "Add"),
         ("d", "delete_todo", "Delete"),
+        ("space", "toggle_done", "Toggle done"),
         ("/", "search", "Search"),
     ]
 
@@ -38,6 +39,9 @@ class TuiDoApp(App):
 
     def action_quit(self) -> None:
         self.exit()
+
+    def action_toggle_done(self) -> None:
+        self.query_one("#main", TodoTable).toggle_done()
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         category_id = event.item.id.replace("cat-", "")
