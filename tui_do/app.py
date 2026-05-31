@@ -5,7 +5,7 @@ from textual.reactive import reactive
 from .store import DataStore
 from .widgets.category_list import CategoryList
 from .widgets.todo_table import TodoTable
-from .screens.modals import AddTodoModal
+from .screens.modals import AddTodoModal, ConfirmDeleteModal
 from .models import Todo
 
 class TuiDoApp(App):
@@ -60,6 +60,22 @@ class TuiDoApp(App):
                 self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
         
         self.push_screen(AddTodoModal(), on_modal_dismiss)
+
+    def action_delete_todo(self) -> None:
+        todo_id = self.query_one("#main", TodoTable).get_selected_todo_id()
+        if not todo_id:
+            self.notify("No todo selected", severity="warning", timeout=2.5)
+            return
+        todo = next((t for t in self.store.todos if t.id == todo_id), None)
+        if not todo:
+            return
+        
+        def on_confirm(confirmed: bool) -> None:
+            if confirmed:
+                self.store.delete_todo(todo_id)
+                self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
+
+        self.push_screen(ConfirmDeleteModal(todo.title), on_confirm)
 
 if __name__ == "__main__":
     TuiDoApp().run()

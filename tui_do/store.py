@@ -3,6 +3,7 @@ import json
 from datetime import date
 from pathlib import Path
 from  .models import Category, Todo, Priority
+from .widgets import todo_table
 
 DATA_FILE = Path("data/todos.json")
 
@@ -50,6 +51,15 @@ class DataStore:
     def add_todo(self, todo:Todo) -> None:
         self.todos.append(todo)
         self._save()
+    
+    def delete_todo(self, todo_id: str) -> None:
+        todo_to_del = next((t for t in self.todos if t.id == todo_id), None)
+        if not todo_to_del:
+            return
+        self.todos.remove(todo_to_del)
+        self._save()
+
+
 
     def get_todos_for_category(self, category_id: str) -> list[Todo]:
         return [t for t in self.todos if t.category_id == category_id]

@@ -4,6 +4,7 @@ from textual.widgets import Button, Input, Label, Select
 from textual.containers import Vertical, Horizontal
 from ..models import Todo, Priority
 
+
 class AddTodoModal(ModalScreen):
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
@@ -52,3 +53,22 @@ class AddTodoModal(ModalScreen):
             due_date=due_date,
             notes=notes,
         )) 
+
+class ConfirmDeleteModal(ModalScreen):
+    def __init__(self, todo_title: str) -> None:
+        super().__init__()
+        self.todo_title = todo_title
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="dialog"):
+            yield Label(f"Delete '{self.todo_title}'?",id="dialog-title")
+            yield Label("This cannot be undone.", id="dialog-subtitle")
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Delete", variant="error", id="btn-confirm")
+                yield Button("Cancel", variant="default", id="btn-cancel")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "btn-confirm":
+            self.dismiss(True)
+        else:
+            self.dismiss(False)
