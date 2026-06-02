@@ -5,7 +5,7 @@ from textual.reactive import reactive
 from .store import DataStore
 from .widgets.category_list import CategoryList
 from .widgets.todo_table import TodoTable
-from .screens.modals import AddTodoModal, ConfirmDeleteModal
+from .screens.modals import AddTodoModal, ConfirmDeleteModal, EditTodoModal
 from .models import Todo
 
 class TuiDoApp(App):
@@ -17,10 +17,11 @@ class TuiDoApp(App):
 
     BINDINGS = [
         # ("keybind", "action", "Description"),
+        ("space", "toggle_done", "Toggle done"),
+        ("e", "edit_todo", "edit todo"),
         ("q", "quit", "Quit"),
         ("a", "add_todo", "Add"),
         ("d", "delete_todo", "Delete"),
-        ("space", "toggle_done", "Toggle done"),
         ("/", "search", "Search"),
     ]
 
@@ -76,6 +77,22 @@ class TuiDoApp(App):
                 self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
 
         self.push_screen(ConfirmDeleteModal(todo.title), on_confirm)
+
+    def action_edit_todo(self) -> None:
+        todo_id = self.query_one("#main", TodoTable).get_selected_todo_id()
+        if not todo_id:
+            self.notify("No todo selected", severity="warning", timeout=2.5)
+            return
+        todo = next((t for t in self.store.todos if t.id == todo_id), None)
+        if not todo:
+            return
+        
+        def on_edit_dismiss(updated_todo: Todo | None ) -> None:
+            if updated_todo:
+                self.store._save()
+                self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
+
+        self.push_screen(EditTodoModal(todo), on_edit_dismiss)
 
 if __name__ == "__main__":
     TuiDoApp().run()
