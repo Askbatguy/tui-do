@@ -34,3 +34,11 @@ AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal {
     align-horizontal: right;
     margin-top: 1;
 }
+
+CategoryList:focus {
+    border: solid $accent;
+}
+
+TodoTable:focus {
+    border: solid $accent;
+}
