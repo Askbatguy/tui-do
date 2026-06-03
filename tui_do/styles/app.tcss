@@ -5,8 +5,35 @@
     padding: 1;
 }
 
-#main {
+#main-panel {
     width: 75%;
+}
+
+#todo-header {
+    height: 3;
+    padding: 1;
+    background: $secondary-darken-2;
+}
+
+#category-label {
+    width: 1fr;
+}
+
+#task-count {
+    width: auto;
+}
+
+#todo-progress {
+    width: 1fr;
+    height: 1;
+    margin: 0 1;
+}
+
+#todo-progress > Bar {
+    width: 1fr;
+}
+
+#main {
     padding: 1;
 }
 

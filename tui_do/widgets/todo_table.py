@@ -3,7 +3,7 @@ from textual.app import App
 from textual.reactive import reactive
 from ..models import Todo, SortMode, Priority
 from ..screens.modals import AddTodoModal, EditTodoModal, ConfirmDeleteModal
-
+from .category_list import CategoryList
 
 class TodoTable(DataTable):
 
@@ -74,6 +74,8 @@ class TodoTable(DataTable):
 
     def action_toggle_done(self) -> None:
         self.toggle_done()
+        self.app.query_one("#sidebar", CategoryList).refresh_category_count(self.app.selected_category_id)
+        self.app.refresh_todo_header()
 
     def action_add_todo(self) -> None:
         if not self.app.selected_category_id:
@@ -85,7 +87,9 @@ class TodoTable(DataTable):
                 new_todo.category_id = self.app.selected_category_id
                 self.app.store.add_todo(new_todo)
                 self.refresh_todos(self.app.selected_category_id)
-        
+                self.app.query_one("#sidebar", CategoryList).refresh_category_count(self.app.selected_category_id)
+                self.app.refresh_todo_header()
+
         self.app.push_screen(AddTodoModal(), on_modal_dismiss)
 
     def action_delete_todo(self) -> None:
@@ -101,7 +105,9 @@ class TodoTable(DataTable):
             if confirmed:
                 self.app.store.delete_todo(todo_id)
                 self.refresh_todos(self.app.selected_category_id)
-
+                self.app.query_one("#sidebar", CategoryList).refresh_category_count(self.app.selected_category_id)
+                self.app.refresh_todo_header()
+                
         self.app.push_screen(ConfirmDeleteModal(f"Delete '{todo.title}'? This cannot be undone."), on_confirm)
 
     def action_edit_todo(self) -> None:

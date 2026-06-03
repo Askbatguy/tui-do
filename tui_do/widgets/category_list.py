@@ -15,7 +15,10 @@ class CategoryList(ListView):
 
     def _populate(self) -> None:
         for category in self.app.store.categories:
-            item = ListItem(Label(category.name))
+            todos = self.app.store.get_todos_for_category(category.id)
+            done_count = sum(t.done for t in todos)
+            total_count = len(todos)
+            item = ListItem(Label(f"{category.name} ({done_count}/{total_count})"))
             item.data = category.id
             self.append(item)
 
@@ -25,7 +28,7 @@ class CategoryList(ListView):
                 return
             new_category = Category(name= name)
             self.app.store.add_category(new_category)
-            item = ListItem(Label(name))
+            item = ListItem(Label(f"{name} (0/0)"))
             item.data = new_category.id
             self.append(item)
 
@@ -74,3 +77,11 @@ class CategoryList(ListView):
 
         self.app.push_screen(ConfirmDeleteModal(f"Delete {category_name}? This will also delete {todo_count} todo{'s' if todo_count != 1 else ''} forever. This action Cannot be undone!"), on_delete_confirmed)
 
+    def refresh_category_count(self, category_id: str) -> None:
+        for item in self.query(ListItem):
+            if item.data == category_id:
+                todos = self.app.store.get_todos_for_category(category_id)
+                done_count = sum(t.done for t in todos)
+                total_count = len(todos)
+                category = next(c for c in self.app.store.categories if c.id == category_id)
+                item.query_one(Label).update(f"{category.name} ({done_count}/{total_count})")
