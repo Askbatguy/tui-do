@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer,ListView, ListItem, ProgressBar, Label
+from textual.widgets import Header, Footer,ListView, ListItem, ProgressBar, Label, Input
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from .store import DataStore
@@ -31,12 +31,19 @@ class TuiDoApp(App):
                     yield Label("Select a category", id="category-label")
                     yield Label("", id="task-count")
                 yield ProgressBar(total=100, id="todo-progress", show_eta= False)
+                yield Input(placeholder=" Search todos...", id="search-input")
                 yield TodoTable(id="main")
+
         yield Footer()
     
 
     def action_quit(self) -> None:
         self.exit()
+
+    def action_search(self) -> None:
+        search_input = self.query_one("#search-input", Input)
+        search_input.display = True
+        search_input.focus() 
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         category_id = event.item.data
@@ -68,6 +75,19 @@ class TuiDoApp(App):
         progress_bar.total = total_count if total_count > 0 else 1
         progress_bar.progress = done_count
 
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "search-input":
+            search_term = event.value.strip().lower()
+            self.query_one("#main", TodoTable).filter_todos(search_term, self.selected_category_id)
+
+    def _on_key(self, event) -> None:
+        if event.key == "escape":
+            search_input = self.query_one("#search-input", Input)
+            if search_input.display:
+                search_input.display = False
+                search_input.value = ""
+                if self.selected_category_id:
+                    self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
 
 if __name__ == "__main__":
     TuiDoApp().run()

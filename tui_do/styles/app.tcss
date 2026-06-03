@@ -74,3 +74,8 @@ TodoTable:focus {
     background: $accent;
     color: $text;
 }
+
+#search-input {
+    display: none;
+    margin: 1 1;
+}

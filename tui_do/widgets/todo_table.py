@@ -44,6 +44,31 @@ class TodoTable(DataTable):
                 key=todo.id,
             )
     
+    def filter_todos(self, search_term: str, category_id: str | None) -> None:
+        if not category_id:
+            return
+        self.clear()
+        todos = self.app.store.get_todos_for_category(category_id)
+        if self.sort_mode != SortMode.NONE:
+            if self.sort_mode == SortMode.NAME:
+                todos = sorted(todos, key=lambda t: t.title.lower())
+            elif self.sort_mode == SortMode.PRIORITY:
+                order = {Priority.HIGH: 0, Priority.MEDIUM: 1, Priority.LOW: 2}
+                todos = sorted(todos, key=lambda t: order[t.priority])
+            elif self.sort_mode == SortMode.DUE_DATE:
+                todos = sorted(todos, key=lambda t: (t.due_date is None, t.due_date))
+        if search_term:
+            todos = [t for t in todos if search_term in t.title.lower()]
+        for todo in todos:
+            title = f"[red]{todo.title}[/red]" if todo.is_overdue else todo.title
+            self.add_row(
+                title,
+                todo.priority.value,
+                str(todo.due_date) if todo.due_date else "—",
+                "✅" if todo.done else "☐",
+                key=todo.id,
+            )
+
     def get_selected_todo_id(self) -> str | None:
         if self.row_count == 0:
             return None
@@ -107,7 +132,7 @@ class TodoTable(DataTable):
                 self.refresh_todos(self.app.selected_category_id)
                 self.app.query_one("#sidebar", CategoryList).refresh_category_count(self.app.selected_category_id)
                 self.app.refresh_todo_header()
-                
+
         self.app.push_screen(ConfirmDeleteModal(f"Delete '{todo.title}'? This cannot be undone."), on_confirm)
 
     def action_edit_todo(self) -> None:
