@@ -10,7 +10,7 @@
     padding: 1;
 }
 
-AddTodoModal, EditTodoModal, ConfirmDeleteModal {
+AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal {
     align: center middle;
 }
 

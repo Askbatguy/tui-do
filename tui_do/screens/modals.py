@@ -55,14 +55,13 @@ class AddTodoModal(ModalScreen):
         )) 
 
 class ConfirmDeleteModal(ModalScreen):
-    def __init__(self, todo_title: str) -> None:
+    def __init__(self, message: str) -> None:
         super().__init__()
-        self.todo_title = todo_title
+        self.message = message
 
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
-            yield Label(f"Delete '{self.todo_title}'?",id="dialog-title")
-            yield Label("This cannot be undone.", id="dialog-subtitle")
+            yield Label( self.message ,id="dialog-title")
             with Horizontal(id="dialog-buttons"):
                 yield Button("Delete", variant="error", id="btn-confirm")
                 yield Button("Cancel", variant="default", id="btn-cancel")
@@ -135,3 +134,31 @@ class EditTodoModal(ModalScreen):
         self.todo.due_date = due_date
         self.todo.notes = notes
         self.dismiss(self.todo)
+
+class CategoryNameModal(ModalScreen):
+    def __init__(self, existing_name: str = "") -> None:
+        super().__init__()
+        self.existing_name = existing_name
+
+    def compose(self) -> ComposeResult:
+        is_rename = bool(self.existing_name)
+        with Vertical(id="dialog"):
+            yield Label("Rename Category" if is_rename else "New Category", id="dialog-title")
+            yield Input(
+                value=self.existing_name,
+                placeholder="Category name",
+                id="input-name"
+            )
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Save" if is_rename else "Add", variant="primary", id="btn-confirm")
+                yield Button("Cancel", variant="default",id="btn-cancel")
+    
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "btn-cancel":
+            self.dismiss(None)
+        elif event.button.id == "btn-confirm":
+            name = self.query_one("#input-name", Input).value.strip()
+            if not name:
+                self.query_one("#dialog-title", Label).update("⚠️ Name is required")
+                return
+            self.dismiss(name)

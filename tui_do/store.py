@@ -48,6 +48,25 @@ class DataStore:
         }
         DATA_FILE.write_text(json.dumps(payload, indent=2, default=str))
 
+    def add_category(self, category: Category) -> None:
+        self.categories.append(category)
+        self._save()
+
+    def rename_category(self, category_id: str, new_name:str) -> None:
+        category_to_rename = next ((c for c in self.categories if c.id == category_id), None)
+        if not category_to_rename:
+            return
+        category_to_rename.name = new_name 
+        self._save()
+    
+    def delete_category(self, category_id: str) -> None:
+        self.todos = [t for t in self.todos if t.category_id != category_id]
+        category_to_del = next((c for c in self.categories if c.id == category_id), None)
+        if not category_to_del:
+            return
+        self.categories.remove(category_to_del)
+        self._save()
+
     def add_todo(self, todo:Todo) -> None:
         self.todos.append(todo)
         self._save()
@@ -58,8 +77,6 @@ class DataStore:
             return
         self.todos.remove(todo_to_del)
         self._save()
-
-
 
     def get_todos_for_category(self, category_id: str) -> list[Todo]:
         return [t for t in self.todos if t.category_id == category_id]
