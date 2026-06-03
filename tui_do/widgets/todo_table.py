@@ -1,6 +1,7 @@
 from textual.widgets import DataTable
 from textual.app import App
-from ..models import Todo
+from textual.reactive import reactive
+from ..models import Todo, SortMode, Priority
 from ..screens.modals import AddTodoModal, EditTodoModal, ConfirmDeleteModal
 
 
@@ -11,7 +12,12 @@ class TodoTable(DataTable):
         ("d", "delete_todo", "Delete"),
         ("e", "edit_todo", "Edit"),
         ("space", "toggle_done", "Toggle done"),
+        ("s", "cycle_sort", "Cycle Sort Modes")
     ]
+
+    sort_mode: reactive[SortMode] = reactive(SortMode.NONE)
+
+    SORT_CYCLE = [SortMode.NONE, SortMode.NAME, SortMode.PRIORITY, SortMode.DUE_DATE]
 
     def on_mount(self) -> None:
         self.add_columns("Title", "Priority", "Due Date", "Done")
@@ -19,6 +25,15 @@ class TodoTable(DataTable):
     def refresh_todos(self, category_id: str) -> None:
         self.clear()
         todos = self.app.store.get_todos_for_category(category_id)
+
+        if self.sort_mode == SortMode.NAME:
+            todos = sorted(todos, key=lambda t: t.title.lower())
+        elif self.sort_mode == SortMode.PRIORITY:
+            order = {Priority.HIGH: 0, Priority.MEDIUM: 1, Priority.LOW: 2}
+            todos = sorted(todos, key=lambda t: order[t.priority])
+        elif self.sort_mode == SortMode.DUE_DATE:
+            todos = sorted(todos, key=lambda t: (t.due_date is None, t.due_date))
+
         for todo in todos:
             title = f"[red]{todo.title}[/red]" if todo.is_overdue else todo.title
             self.add_row(
@@ -46,6 +61,16 @@ class TodoTable(DataTable):
         self.refresh_todos(self.app.selected_category_id)
         if self.row_count > 0:
             self.move_cursor(row=current_row)
+
+    def action_cycle_sort(self) -> None:
+        current_index = self.SORT_CYCLE.index(self.sort_mode)
+        next_index = (current_index + 1) % len(self.SORT_CYCLE)
+        self.sort_mode = self.SORT_CYCLE[next_index]
+
+    def watch_sort_mode(self, mode: SortMode) -> None:
+        if self.app.selected_category_id:
+            self.refresh_todos(self.app.selected_category_id)
+        self.app.notify(f"Sort: {mode.value}", timeout=1.5)
 
     def action_toggle_done(self) -> None:
         self.toggle_done()

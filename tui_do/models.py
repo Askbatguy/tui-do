@@ -8,6 +8,12 @@ class Priority(Enum):
     MEDIUM = "medium"
     HIGH = "high"
 
+class SortMode(Enum):
+    NONE = "none"
+    NAME = "name"
+    PRIORITY = "priority"
+    DUE_DATE = "due date"
+
 @dataclass
 class Todo:
     title: str
