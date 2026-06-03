@@ -20,8 +20,9 @@ class TodoTable(DataTable):
         self.clear()
         todos = self.app.store.get_todos_for_category(category_id)
         for todo in todos:
+            title = f"[red]{todo.title}[/red]" if todo.is_overdue else todo.title
             self.add_row(
-                todo.title,
+                title,
                 todo.priority.value,
                 str(todo.due_date) if todo.due_date else "—",
                 "✅" if todo.done else "☐",

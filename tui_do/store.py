@@ -87,7 +87,8 @@ class DataStore:
         self.categories = [work, personal]
         self.todos = [
             Todo(title="Write project report", category_id=work.id, priority=Priority.HIGH),
-            Todo(title="Buy Groceries", category_id=personal.id, priority=Priority.MEDIUM),            
+            Todo(title="Buy Groceries", category_id=personal.id, priority=Priority.MEDIUM),
+            Todo(title="change light bulb", category_id=personal.id, priority=Priority.LOW),                 
         ]
         self._save()
 

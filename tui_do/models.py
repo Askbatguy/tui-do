@@ -19,8 +19,11 @@ class Todo:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = field(default_factory=lambda: date.today().isoformat())
 
+    @property
+    def is_overdue(self) -> bool:
+        return self.due_date is not None and not self.done and self.due_date < date.today()
+
 @dataclass
 class Category:
     name: str
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    
