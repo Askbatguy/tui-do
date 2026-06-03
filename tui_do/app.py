@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer,ListView
+from textual.widgets import Header, Footer,ListView, ListItem
 from textual.containers import Horizontal
 from textual.reactive import reactive
 from .store import DataStore
@@ -36,6 +36,11 @@ class TuiDoApp(App):
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         category_id = event.item.data
         self.selected_category_id = category_id
+
+        for item in self.query_one("#sidebar", CategoryList).query(ListItem):
+            item.remove_class("selected-category")
+
+        event.item.add_class("selected-category")
         self.query_one("#main", TodoTable).refresh_todos(category_id)
 
     

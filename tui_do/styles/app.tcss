@@ -42,3 +42,8 @@ CategoryList:focus {
 TodoTable:focus {
     border: solid $accent;
 }
+
+.selected-category {
+    background: $accent;
+    color: $text;
+}
