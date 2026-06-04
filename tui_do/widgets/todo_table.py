@@ -14,10 +14,13 @@ class TodoTable(DataTable):
         ("e", "edit_todo", "Edit"),
         ("space", "toggle_done", "Toggle done"),
         ("s", "cycle_sort", "Cycle Sort Modes"),
+        ("h", "toggle_hide_completed", "Hide Completed Todos"),
         ("enter", "view_todo", "View Todo Details"),
     ]
 
     sort_mode: reactive[SortMode] = reactive(SortMode.NONE)
+
+    hide_completed: reactive[bool] = reactive(False)
 
     SORT_CYCLE = [SortMode.NONE, SortMode.NAME, SortMode.PRIORITY, SortMode.DUE_DATE]
 
@@ -35,6 +38,9 @@ class TodoTable(DataTable):
             todos = sorted(todos, key=lambda t: order[t.priority])
         elif self.sort_mode == SortMode.DUE_DATE:
             todos = sorted(todos, key=lambda t: (t.due_date is None, t.due_date))
+
+        if self.hide_completed:
+            todos = [t for t in todos if not t.done]
 
         for todo in todos:
             title = f"[red]{todo.title}[/red]" if todo.is_overdue else todo.title
@@ -59,6 +65,9 @@ class TodoTable(DataTable):
                 todos = sorted(todos, key=lambda t: order[t.priority])
             elif self.sort_mode == SortMode.DUE_DATE:
                 todos = sorted(todos, key=lambda t: (t.due_date is None, t.due_date))
+        
+        if self.hide_completed:
+            todos = [t for t in todos if not t.done]
         if search_term:
             todos = [t for t in todos if search_term in t.title.lower()]
         for todo in todos:
@@ -98,6 +107,13 @@ class TodoTable(DataTable):
         if self.app.selected_category_id:
             self.refresh_todos(self.app.selected_category_id)
         self.app.notify(f"Sort: {mode.value}", timeout=1.5)
+
+    def watch_hide_completed(self, value:bool) -> None:
+        current_row = self.cursor_row
+        if self.app.selected_category_id:
+            self.refresh_todos(self.app.selected_category_id)
+        if self.row_count>0:
+            self.move_cursor(row=current_row)
 
     def action_toggle_done(self) -> None:
         self.toggle_done()
@@ -193,3 +209,10 @@ class TodoTable(DataTable):
             todo = next((t for t in self.app.store.todos if t.id == todo_id), None)
             if todo:
                 self.app.push_screen(TodoDetailModal(todo))
+
+    def action_toggle_hide_completed(self) -> None:
+        self.hide_completed = not self.hide_completed
+        if self.hide_completed:
+            self.app.notify("Completed Todos Hidden!",timeout=1.5)
+        else:
+            self.app.notify("Showing all todos", timeout=1.5)
