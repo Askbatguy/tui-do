@@ -28,3 +28,6 @@ class SplashScreen(ModalScreen):
         event.stop()
         self.dismiss()
         
+    def on_click(self, event) -> None:
+        event.stop()
+        self.dismiss()

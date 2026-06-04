@@ -206,5 +206,8 @@ class TodoDetailModal(ModalScreen):
     def on_key(self, event) -> None:
         event.stop()
         self.dismiss()
-
+        
+    def on_click(self, event) -> None:
+        event.stop()
+        self.dismiss()
 

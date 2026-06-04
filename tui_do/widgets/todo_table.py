@@ -1,6 +1,7 @@
 from textual.widgets import DataTable
 from textual.app import App
 from textual.reactive import reactive
+from textual.coordinate import Coordinate
 from ..models import Todo, SortMode, Priority
 from ..screens.modals import AddTodoModal, EditTodoModal, ConfirmDeleteModal, TodoDetailModal
 from .category_list import CategoryList
@@ -163,4 +164,32 @@ class TodoTable(DataTable):
         
         self.app.push_screen(TodoDetailModal(todo))
 
+
+    def on_click(self, event) -> None:
+        meta = event.style.meta
+        if not meta:
+            return
+        row = meta.get("row")
+        column = meta.get("column")
+        if row is None or column is None:
+            return
         
+        # column 3 refers to the done column 
+        if column == 3:
+            event.stop()
+            self.move_cursor(row=row)
+            self.toggle_done()
+            self.app.query_one("#sidebar", CategoryList).refresh_category_count(self.app.selected_category_id)
+            self.app.refresh_todo_header()
+        
+        elif event.button == 3: #right click to edit
+            event.stop()
+            self.move_cursor(row=row)
+            self.action_edit_todo()
+
+        elif event.button == 1:
+            row_key, _ = self.coordinate_to_cell_key(Coordinate(row,0))
+            todo_id = row_key.value
+            todo = next((t for t in self.app.store.todos if t.id == todo_id), None)
+            if todo:
+                self.app.push_screen(TodoDetailModal(todo))
