@@ -37,7 +37,7 @@
     padding: 1;
 }
 
-AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal {
+AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal, TodoDetailModal {
     align: center middle;
 }
 
@@ -113,3 +113,26 @@ SplashScreen {
     text-style: italic;
     margin-top: 1;
 }
+
+#todo-detail {
+    width: 60;
+    height: auto;
+    background: $surface;
+    border: solid $primary;
+    padding: 2 4;
+}
+
+#detail-title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+    text-align: center;
+    width: 100%;
+}
+
+#detail-hint {
+    margin-top: 1;
+    text-align: center;
+    width: 100%;
+}
+

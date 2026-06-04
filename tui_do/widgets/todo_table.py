@@ -2,7 +2,7 @@ from textual.widgets import DataTable
 from textual.app import App
 from textual.reactive import reactive
 from ..models import Todo, SortMode, Priority
-from ..screens.modals import AddTodoModal, EditTodoModal, ConfirmDeleteModal
+from ..screens.modals import AddTodoModal, EditTodoModal, ConfirmDeleteModal, TodoDetailModal
 from .category_list import CategoryList
 
 class TodoTable(DataTable):
@@ -12,7 +12,8 @@ class TodoTable(DataTable):
         ("d", "delete_todo", "Delete"),
         ("e", "edit_todo", "Edit"),
         ("space", "toggle_done", "Toggle done"),
-        ("s", "cycle_sort", "Cycle Sort Modes")
+        ("s", "cycle_sort", "Cycle Sort Modes"),
+        ("enter", "view_todo", "View Todo Details"),
     ]
 
     sort_mode: reactive[SortMode] = reactive(SortMode.NONE)
@@ -151,3 +152,15 @@ class TodoTable(DataTable):
 
         self.app.push_screen(EditTodoModal(todo), on_edit_dismiss)
 
+    def action_view_todo(self) -> None:
+        todo_id = self.get_selected_todo_id()
+        if not todo_id:
+            self.app.notify("No todo selected", severity="warning", timeout=2.5)
+            return
+        todo = next((t for t in self.app.store.todos if t.id == todo_id), None)
+        if not todo:
+            return
+        
+        self.app.push_screen(TodoDetailModal(todo))
+
+        

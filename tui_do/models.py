@@ -28,6 +28,12 @@ class Todo:
     @property
     def is_overdue(self) -> bool:
         return self.due_date is not None and not self.done and self.due_date < date.today()
+    
+    @property
+    def days_until_due(self) -> int | None:
+        if self.due_date is None:
+            return None
+        return (self.due_date - date.today()).days
 
 @dataclass
 class Category:

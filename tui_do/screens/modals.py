@@ -1,6 +1,6 @@
 from textual.app import ComposeResult
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, Select
+from textual.widgets import Button, Input, Label, Select, Static
 from textual.containers import Vertical, Horizontal
 from ..models import Todo, Priority
 
@@ -34,9 +34,9 @@ class AddTodoModal(ModalScreen):
             return
         
         priority_val = self.query_one("#input-priority", Select).value
-        if not priority_val:
-            self.query_one("#dialog-title", Label).update("⚠️ Priority is required")
-            return
+        if priority_val is Select.NULL:
+            priority_val = Priority.MEDIUM.value
+            self.app.notify("Priority defaulted to medium - edit todo to change", timeout=3)
         due_raw = self.query_one("#input-due",Input).value.strip()
         notes = self.query_one("#input-notes", Input).value.strip()
 
@@ -165,3 +165,46 @@ class CategoryNameModal(ModalScreen):
                 self.query_one("#dialog-title", Label).update("⚠️ Name is required")
                 return
             self.dismiss(name)
+
+
+class TodoDetailModal(ModalScreen):
+    def __init__(self, todo: Todo) -> None:
+        super().__init__()
+        self.todo = todo
+
+    def compose(self) -> ComposeResult:
+        category = next(c for c in self.app.store.categories if c.id == self.todo.category_id)
+
+        if self.todo.done:
+            due_str = f"{self.todo.due_date} ([green]Completed ✅[/green])" if self.todo.due_date else "Completed ✅"
+        elif self.todo.days_until_due is None:
+           due_str = "No due date"
+        elif self.todo.days_until_due < 0:
+            due_str = f"{self.todo.due_date} ([red]{abs(self.todo.days_until_due)} days overdue!!![/red])"
+        elif self.todo.days_until_due == 0:
+            due_str = f"{self.todo.due_date} ([yellow]Due today![/yellow])"
+        else:
+            due_str = f"{self.todo.due_date} ([green]{self.todo.days_until_due} days remaining[/green])"
+        
+        priority_colours = {
+            "high": "orange",
+            "medium": "yellow",
+            "low": "green",
+        }
+        colour = priority_colours[self.todo.priority.value]
+
+        with Vertical(id="todo-detail"):
+            yield Static(f"[bold]{self.todo.title}[/bold]", id="detail-title")
+            yield Static(f"[dim]Category:[/dim] {category.name}")
+            yield Static(f"[dim]Priority:[/dim] [{colour}]{self.todo.priority.value}[/{colour}]")
+            yield Static(f"[dim]Due:[/dim] {due_str}")
+            yield Static(f"[dim]Created:[/dim] {self.todo.created_at}")
+            yield Static(f"[dim]Notes:[/dim] {self.todo.notes if self.todo.notes else 'No Notes!'}")
+            yield Static(f"[dim]Done:[/dim] {'✅ [green]Yes[/green]' if self.todo.done else '☐ [yellow]No[/yellow]'}")
+            yield Static(f"[dim italic]press any key to close[/dim italic]", id="detail-hint")
+        
+    def on_key(self, event) -> None:
+        event.stop()
+        self.dismiss()
+
+
