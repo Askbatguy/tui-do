@@ -34,6 +34,9 @@ class AddTodoModal(ModalScreen):
             return
         
         priority_val = self.query_one("#input-priority", Select).value
+        if not priority_val:
+            self.query_one("#dialog-title", Label).update("⚠️ Priority is required")
+            return
         due_raw = self.query_one("#input-due",Input).value.strip()
         notes = self.query_one("#input-notes", Input).value.strip()
 

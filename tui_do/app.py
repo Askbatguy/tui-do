@@ -5,6 +5,7 @@ from textual.reactive import reactive
 from .store import DataStore
 from .widgets.category_list import CategoryList
 from .widgets.todo_table import TodoTable
+from .screens.splash import SplashScreen
 
 class TuiDoApp(App):
     """tui-do get it to-do yeah its a todo list app!"""
@@ -35,8 +36,10 @@ class TuiDoApp(App):
                 yield TodoTable(id="main")
 
         yield Footer()
-    
 
+    def on_mount(self) -> None:
+        self.push_screen(SplashScreen())
+    
     def action_quit(self) -> None:
         self.exit()
 

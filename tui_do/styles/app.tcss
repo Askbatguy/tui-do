@@ -79,3 +79,37 @@ TodoTable:focus {
     display: none;
     margin: 1 1;
 }
+
+SplashScreen {
+    align: center middle;
+}
+
+#splash {
+    width: 100;
+    height: auto;
+    background: $surface;
+    border: double $accent;
+    padding: 2 4;
+    align: center middle;
+}
+
+#splash-title {
+    color: $accent;
+    width: 100%;
+    text-align: center; 
+}
+
+#splash-subtitle {
+    width: 100%;
+    text-align: center;
+    color: $text-muted;
+    margin-top: 1;
+}
+
+#splash-hint {
+    width: 100%;
+    text-align: center;
+    color: $text-muted;
+    text-style: italic;
+    margin-top: 1;
+}
