@@ -187,7 +187,7 @@ class TodoTable(DataTable):
             return
         row = meta.get("row")
         column = meta.get("column")
-        if row is None or column is None:
+        if row is None or column is None or row < 0:
             return
         
         # column 3 refers to the done column 
