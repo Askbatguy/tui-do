@@ -1,6 +1,6 @@
 from textual.app import ComposeResult
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, Select, Static
+from textual.widgets import Button, Input, Label, Select, Static, ListView, ListItem
 from textual.containers import Vertical, Horizontal
 from ..models import Todo, Priority
 
@@ -211,3 +211,34 @@ class TodoDetailModal(ModalScreen):
         event.stop()
         self.dismiss()
 
+class GlobalSearchModal(ModalScreen[Todo | None]):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
+    def compose(self) -> ComposeResult:
+        with Vertical(id="search-panel"):
+            yield Static("Press \\[Esc] to exit",id="search-hint")
+            yield Input(placeholder="Search todos...",id="search-field")
+            yield Static("Title---\\[Category Name]---Priority---Due Date", id="result-header")
+            yield ListView(id="search-results")
+    
+    def on_input_changed(self, event:Input.Changed) -> None:
+        search_term = event.value.strip().lower()
+        results = self.query_one("#search-results", ListView)
+        if not search_term:
+            results.clear()
+            return
+        
+        results.clear()
+
+        todos = [t for t in self.app.store.todos if search_term in t.title.lower()]
+
+        for todo in todos:
+            category = next(c for c in self.app.store.categories if c.id == todo.category_id)
+            due = str(todo.due_date) if todo.due_date else "--"
+            label = f"{todo.title} \\[{category.name}] {todo.priority.value} {due}"
+            item = ListItem(Label(label))
+            item.data = todo
+            results.append(item)
+
+    def on_list_view_selected(self, event: ListView.Selected):
+        todo = event.item.data 
+        self.dismiss(todo)

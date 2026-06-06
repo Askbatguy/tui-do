@@ -37,7 +37,7 @@
     padding: 1;
 }
 
-AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal, TodoDetailModal {
+AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal, TodoDetailModal, GlobalSearchModal {
     align: center middle;
 }
 
@@ -73,11 +73,6 @@ TodoTable:focus {
 .selected-category {
     background: $accent;
     color: $text;
-}
-
-#search-input {
-    display: none;
-    margin: 1 1;
 }
 
 SplashScreen {
@@ -165,3 +160,30 @@ SplashScreen {
     width: 100%;
 }
 
+#search-panel {
+    width: 100;
+    height: 70%;
+    background: $surface;
+    border: double $accent;
+    padding: 2 4;
+    align: center middle;
+}
+
+#search-hint {
+    text-align: right;
+    color: $text-muted;
+    margin-bottom: 1;
+}
+
+#result-header {
+    text-align: center;
+    color: $text-muted;
+    margin-top: 1;
+    margin-bottom: 0;
+}
+
+#search-results {
+    margin-top: 0;
+    height: 1fr;
+    border: solid $primary; 
+}
