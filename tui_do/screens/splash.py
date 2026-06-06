@@ -48,7 +48,9 @@ class SplashScreen(ModalScreen):
     def on_key(self, event) -> None:
         event.stop()
         self.dismiss()
+        self.app.notify("Press [?] if you get lost!", timeout=4)
         
     def on_click(self, event) -> None:
         event.stop()
         self.dismiss()
+        self.app.notify("Press [?] if you get lost!", timeout=4)

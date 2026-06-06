@@ -6,6 +6,7 @@ from .store import DataStore
 from .widgets.category_list import CategoryList
 from .widgets.todo_table import TodoTable
 from .screens.splash import SplashScreen
+from .screens.help import HelpMenu
 
 class TuiDoApp(App):
     """tui-do get it to-do yeah its a todo list app!"""
@@ -18,6 +19,7 @@ class TuiDoApp(App):
         # ("keybind", "action", "Description"),
         ("ctrl+q", "quit", "Quit"),
         ("/", "search", "Search"),
+        ("?", "show_help", "Help Menu"),
     ]
 
     selected_category_id: reactive[str | None] = reactive(None)
@@ -91,6 +93,9 @@ class TuiDoApp(App):
                 search_input.value = ""
                 if self.selected_category_id:
                     self.query_one("#main", TodoTable).refresh_todos(self.selected_category_id)
+
+    def action_show_help(self) -> None:
+        self.push_screen(HelpMenu())
 
 if __name__ == "__main__":
     TuiDoApp().run()

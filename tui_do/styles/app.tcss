@@ -157,3 +157,11 @@ SplashScreen {
     padding: 0 0;
 }
 
+#help-menu {
+    padding: 1 4;
+}
+
+#help-content {
+    width: 100%;
+}
+
