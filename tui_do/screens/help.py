@@ -6,8 +6,8 @@ from textual.widgets import Header, Footer, Static
 class HelpMenu(Screen):
 
     BINDINGS = [
-        ("q", "exit_help", "exit help menu"),
         ("escape", "exit_help", "exit help menu"),
+        ("q", "exit_help", "exit help menu"),
     ]
 
     def compose(self) -> ComposeResult:

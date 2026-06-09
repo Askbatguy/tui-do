@@ -7,6 +7,7 @@ from ..models import Todo, Priority
 
 
 class AddTodoModal(ModalScreen):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
             yield Label("Add Todo", id="dialog-title")
@@ -59,6 +60,7 @@ class AddTodoModal(ModalScreen):
         )) 
 
 class ConfirmDeleteModal(ModalScreen):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
     def __init__(self, message: str) -> None:
         super().__init__()
         self.message = message
@@ -77,6 +79,7 @@ class ConfirmDeleteModal(ModalScreen):
             self.dismiss(False)
 
 class EditTodoModal(ModalScreen):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
     def __init__(self, todo: Todo) -> None:
         super().__init__()
         self.todo = todo
@@ -140,6 +143,7 @@ class EditTodoModal(ModalScreen):
         self.dismiss(self.todo)
 
 class CategoryNameModal(ModalScreen):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
     def __init__(self, existing_name: str = "") -> None:
         super().__init__()
         self.existing_name = existing_name
@@ -169,6 +173,7 @@ class CategoryNameModal(ModalScreen):
 
 
 class TodoDetailModal(ModalScreen):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
     def __init__(self, todo: Todo) -> None:
         super().__init__()
         self.todo = todo
