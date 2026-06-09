@@ -175,11 +175,14 @@ SplashScreen {
     margin-bottom: 1;
 }
 
-#result-header {
+#search-field {
+    margin-bottom: 1;
+}
+
+.result-header {
     text-align: center;
     color: $text-muted;
-    margin-top: 1;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 #search-results {

@@ -2,6 +2,7 @@ from textual.app import ComposeResult
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, Select, Static, ListView, ListItem
 from textual.containers import Vertical, Horizontal
+from textual.fuzzy import Matcher
 from ..models import Todo, Priority
 
 
@@ -213,29 +214,40 @@ class TodoDetailModal(ModalScreen):
 
 class GlobalSearchModal(ModalScreen[Todo | None]):
     BINDINGS = [("escape", "dismiss(None)", "Cancel")]
+    
     def compose(self) -> ComposeResult:
         with Vertical(id="search-panel"):
             yield Static("Press \\[Esc] to exit",id="search-hint")
             yield Input(placeholder="Search todos...",id="search-field")
-            yield Static("Title---\\[Category Name]---Priority---Due Date", id="result-header")
+            yield Static("Title",classes="result-header")
+            yield Static("[cyan dim]\\[Category Name]---Priority---Due Date[/cyan dim]", classes="result-header")
             yield ListView(id="search-results")
     
     def on_input_changed(self, event:Input.Changed) -> None:
-        search_term = event.value.strip().lower()
+        search_term = event.value
         results = self.query_one("#search-results", ListView)
         if not search_term:
             results.clear()
             return
         
         results.clear()
-
-        todos = [t for t in self.app.store.todos if search_term in t.title.lower()]
+        matcher = Matcher(search_term, case_sensitive= False)
+        scored = []
+        for todo in self.app.store.todos:
+            score = matcher.match(todo.title)
+            if score > 0:
+                scored.append((score, todo))
+        
+        scored.sort(key=lambda x: x[0], reverse=True)
+        
+        todos = [todo for score, todo in scored]
 
         for todo in todos:
             category = next(c for c in self.app.store.categories if c.id == todo.category_id)
             due = str(todo.due_date) if todo.due_date else "--"
-            label = f"{todo.title} \\[{category.name}] {todo.priority.value} {due}"
-            item = ListItem(Label(label))
+            highlighted_title = matcher.highlight(todo.title)
+            suffix = f"[cyan dim]\\[{category.name}] {todo.priority.value} {due}[/cyan dim]"
+            item = ListItem(Label(highlighted_title), Label(suffix))
             item.data = todo
             results.append(item)
 
