@@ -27,6 +27,7 @@ HELP_CONTENT = """
   [cyan]↑ / ↓[/cyan]       Move between categories or todos
   [cyan]Enter[/cyan]       View todo details
   [cyan]Ctrl+Q[/cyan]      Quit the app
+  [cyan]/[/cyan]           Search todos across all categories
 
 [bold]TODOS[/bold]  [dim](focus the todo table first)[/dim]
   [cyan]a[/cyan]           Add a new todo
@@ -35,7 +36,6 @@ HELP_CONTENT = """
   [cyan]Space[/cyan]       Toggle todo as done/not done
   [cyan]h[/cyan]           Hide/show completed todos
   [cyan]s[/cyan]           Cycle sort: none → name → priority → due date
-  [cyan]/[/cyan]           Search todos in current category
 
 [bold]CATEGORIES[/bold]  [dim](focus the sidebar first)[/dim]
   [cyan]a[/cyan]           Add a new category
@@ -83,7 +83,7 @@ HELP_CONTENT = """
   • Press [cyan]s[/cyan] to cycle through sort modes — handy for seeing what's 
     due soonest.
   • Press [cyan]h[/cyan] to hide completed todos and reduce clutter.
-  • Press [cyan]/[/cyan] to search todos in the current category.
+  • Press [cyan]/[/cyan] to search todos across all categories.
   • Right-click any todo to edit it instantly.
   • The splash screen on startup shows your most urgent todos.
   • Use [cyan]Ctrl+P[/cyan] to switch themes — tui-do looks great in any theme!

@@ -1,0 +1,2 @@
+textual[syntax]==8.2.5
+pyperclip==1.11.0
