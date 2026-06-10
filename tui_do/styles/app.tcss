@@ -37,7 +37,7 @@
     padding: 1;
 }
 
-AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal, TodoDetailModal, GlobalSearchModal {
+AddTodoModal, EditTodoModal, ConfirmDeleteModal, CategoryNameModal, TodoDetailModal, GlobalSearchModal, ExportMarkdownModal {
     align: center middle;
 }
 
@@ -189,4 +189,50 @@ SplashScreen {
     margin-top: 0;
     height: 1fr;
     border: solid $primary; 
+}
+
+#export-modal {
+    width: 100;
+    height: 85%;
+    background: $surface;
+    border: double $primary;
+    padding: 1 3;
+}
+
+#export-header {
+    text-align: center;
+    text-style: bold;
+    background: $background;
+    color: $text-secondary;
+    margin-bottom: 1;
+    padding: 1 0;
+}
+
+#export-category {
+    border: solid $accent;
+}
+
+#export-preview {
+    max-height: 1fr;
+}
+
+#export-buttons {
+    width: 100%;
+    height: 3;
+    padding: 0 1;
+}
+
+#export-hint {
+    margin-top: 1;
+    width: 1fr;
+    text-align: center;
+    color: $text-muted;
+}
+
+#export-copy {
+    dock: right;
+}
+
+Button.copied {
+    background: green;
 }

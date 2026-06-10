@@ -8,7 +8,7 @@ from .widgets.todo_table import TodoTable
 from .screens.splash import SplashScreen
 from .screens.help import HelpMenu
 from .models import Todo
-from .screens.modals import TodoDetailModal , GlobalSearchModal
+from .screens.modals import TodoDetailModal , GlobalSearchModal, ExportMarkdownModal
 
 class TuiDoApp(App):
     """tui-do get it to-do yeah its a todo list app!"""
@@ -22,6 +22,7 @@ class TuiDoApp(App):
         ("ctrl+q", "quit", "Quit"),
         ("?", "show_help", "Help Menu"),
         ("/", "global_search", "Search"),
+        ("x", "export_markdown", "Export Todos"),
     ]
 
     selected_category_id: reactive[str | None] = reactive(None)
@@ -100,6 +101,9 @@ class TuiDoApp(App):
             self.push_screen(TodoDetailModal(todo))
 
         self.push_screen(GlobalSearchModal(), on_modal_dismiss)
+
+    def action_export_markdown(self) -> None:
+        self.push_screen(ExportMarkdownModal())    
 
 if __name__ == "__main__":
     TuiDoApp().run()

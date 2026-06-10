@@ -1,6 +1,9 @@
+from datetime import date, datetime
+from pathlib import Path
+import pyperclip
 from textual.app import ComposeResult
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, Select, Static, ListView, ListItem
+from textual.widgets import Button, Input, Label, Select, Static, ListView, ListItem, RadioButton, RadioSet, TextArea
 from textual.containers import Vertical, Horizontal
 from textual.fuzzy import Matcher
 from ..models import Todo, Priority
@@ -257,5 +260,104 @@ class GlobalSearchModal(ModalScreen[Todo | None]):
             results.append(item)
 
     def on_list_view_selected(self, event: ListView.Selected):
-        todo = event.item.data 
+        todo = event.item.data
         self.dismiss(todo)
+
+class ExportMarkdownModal(ModalScreen[None]):
+    BINDINGS = [("escape", "dismiss(None)", "Cancel")]
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="export-modal"):
+            yield Static("Export to markdown", id="export-header")
+            yield RadioSet(
+                RadioButton("Export ALL Todos",id="export-all", value= True),
+                RadioButton("Select A Category",id="export-specific"),
+                id="export-radioset"
+            )
+            yield Select([],prompt="Select a Category...", id="export-category",classes="hidden")
+            yield TextArea("", language="markdown",id="export-preview")
+            with Horizontal(id="export-buttons"):
+                yield Button("Export To File",id="export-file")
+                yield Static("You can edit this ↑ before you export/copy",id="export-hint")
+                yield Button("Copy To Clipboard",id="export-copy")
+
+    def on_mount(self) -> None:
+        categories = [(c.name, c.id) for c in self.app.store.categories]
+        self.query_one("#export-category", Select).set_options(categories)
+        self.query_one("#export-category", Select).display = False
+        self.query_one("#export-preview", TextArea).load_text(self.generate_markdown(None))
+    
+    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        category_select = self.query_one("#export-category", Select)
+        preview = self.query_one("#export-preview", TextArea)
+
+        if event.pressed.id == "export-all":
+            category_select.display = False
+            preview.load_text(self.generate_markdown(None))
+        else:
+            category_select.display = True
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        if event.value == Select.NULL:
+            self.app.notify("Please Select A Category", severity="error" ,timeout=2)
+            return
+        preview = self.query_one("#export-preview", TextArea)
+        preview.load_text(self.generate_markdown(event.value))
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "export-file":
+            exports_dir = Path("exports")
+            exports_dir.mkdir(exist_ok=True)
+            export_what = self.query_one("#export-radioset",RadioSet).pressed_index
+            if export_what == -1:
+                return
+            elif export_what == 0:
+                filename = f"Tui-Do_export_as_of_{date.today()}"
+
+            elif export_what == 1:
+                category_id = self.query_one("#export-category", Select).value
+                category = next(c.name for c in self.app.store.categories if c.id == category_id).replace(" ","_")
+                filename = f"{category}_as_of_{date.today()}"
+
+            file_path = exports_dir/ f"{filename}.md"
+            counter = 1
+            while file_path.exists():
+                file_path = exports_dir / f"{filename}({counter}).md"
+                counter += 1
+
+            file_path.write_text(self.query_one("#export-preview", TextArea).text)
+            self.app.notify(f"Exported to {str(file_path)}", severity="information", timeout=3)
+            self.dismiss(None)
+
+        elif event.button.id == "export-copy":
+            pyperclip.copy(self.query_one("#export-preview", TextArea).text)
+            event.button.add_class("copied")
+            self.set_timer(2, lambda: event.button.remove_class("copied"))
+
+
+    def generate_markdown(self, category_id: str | None) -> str:
+        lines = []
+        now = datetime.now()
+        lines.append(f"# Tui-Do Export as of {now.strftime('%a %b %d %H:%M:%S %Y')}")
+        lines.append("")
+
+        if category_id is None:
+            categories = self.app.store.categories
+        else:
+            categories = [c for c in self.app.store.categories if c.id == category_id]
+
+        for i, category in enumerate(categories):
+            lines.append(f"## {category.name}")
+            lines.append("")
+            todos = self.app.store.get_todos_for_category(category.id)
+            for todo in todos:
+                checkbox = "[x]" if todo.done else "[ ]"
+                due = f"__{todo.due_date}__" if todo.due_date else "__--__"
+                created = f"*{todo.created_at}*"
+                lines.append(f"- {checkbox} {todo.title} {due} {created}")
+                lines.append("")
+            if i < len(categories) - 1:
+                lines.append("---")
+                lines.append("")
+
+        return "\n".join(lines)
