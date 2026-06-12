@@ -22,7 +22,7 @@ Yet another todo manager - but this one lives in your terminal.
 ## Installation & Running
 
 ```bash
-git clone https://github.com/yourusername/tui-do.git
+git clone https://github.com/Askbatguy/tui-do.git
 cd tui-do
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
