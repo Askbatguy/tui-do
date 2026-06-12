@@ -355,6 +355,8 @@ class ExportMarkdownModal(ModalScreen[None]):
                 due = f"__{todo.due_date}__" if todo.due_date else "__--__"
                 created = f"*{todo.created_at}*"
                 lines.append(f"- {checkbox} {todo.title} {due} {created}")
+                if todo.notes:
+                    lines.append(f"  >{todo.notes}")
                 lines.append("")
             if i < len(categories) - 1:
                 lines.append("---")
